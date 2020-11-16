@@ -1,0 +1,55 @@
+DECLARE
+    TABELA    VARCHAR2(4000);
+    PARAMETRO VARCHAR2(4000);
+    RESULTADO VARCHAR2(4000);
+    QUERYS    VARCHAR2(4000);
+    MAXIMO    NUMBER;
+    MINIMO    NUMBER;
+    TYPE DINCURSOR IS REF CURSOR;
+    ORIGEM DINCURSOR;
+BEGIN
+    TABELA    := :TABELA;
+    PARAMETRO := :PARAMETRO;
+    RESULTADO := NULL;
+    FOR I IN (SELECT DISTINCT(COLUMN_NAME) AS COLUNA, DATA_TYPE AS DADOS, COLUMN_ID AS ID FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = TABELA ORDER BY COLUMN_ID ASC)
+    LOOP
+        QUERYS := 'SELECT '||I.COLUNA||' FROM '|| TABELA;
+        
+        IF PARAMETRO IS NOT NULL THEN
+            QUERYS := QUERYS || ' WHERE ' || PARAMETRO;
+        END IF;
+        
+        IF I.DADOS IN ('CLOB', 'BLOB') THEN
+            RESULTADO := '"' ||I.DADOS|| '"';
+        ELSE
+            OPEN  ORIGEM  FOR QUERYS;
+            FETCH ORIGEM INTO RESULTADO;
+            CLOSE ORIGEM;
+        END IF;
+        
+        I.COLUNA := '"' || LOWER(I.COLUNA) || '"';
+        
+        IF I.DADOS IN ('NUMBER, FLOAT') THEN
+            RESULTADO := CAST(RESULTADO AS NUMBER);
+        ELSE
+            RESULTADO := '"' || RESULTADO || '"';
+        END IF;
+        
+        SELECT MAX(COLUMN_ID), MIN(COLUMN_ID)
+          INTO MAXIMO, MINIMO
+          FROM ALL_TAB_COLUMNS
+         WHERE TABLE_NAME = TABELA;
+        
+        IF I.ID = MINIMO THEN
+            DBMS_OUTPUT.PUT_LINE('{');
+        END IF;
+        
+        IF I.ID = MAXIMO THEN
+            DBMS_OUTPUT.PUT_LINE('    ' || I.COLUNA ||' : '|| RESULTADO);
+            DBMS_OUTPUT.PUT_LINE('}');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('    ' || I.COLUNA ||' : '|| RESULTADO ||',');
+        END IF;
+    END LOOP;
+END;
+/
