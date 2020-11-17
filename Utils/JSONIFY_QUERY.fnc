@@ -1,0 +1,63 @@
+CREATE OR REPLACE FUNCTION JSONIFY_QUERY(P_TABELA VARCHAR2, P_COLUNAS VARCHAR2, P_PARAMETRO VARCHAR2)
+RETURN VARCHAR2
+AS
+    RETORNO VARCHAR2(32767);
+    RESULTADO VARCHAR2(4000);
+    QUERYS  VARCHAR2(4000);
+    DADOS   VARCHAR2(4000);
+    P_TEXT  VARCHAR2(4000);
+    MAXIMO  NUMBER;
+    COUNTER NUMBER := 0;
+    TYPE    DINCURSOR IS REF CURSOR;
+    ORIGEM  DINCURSOR;
+BEGIN
+    RETORNO := NL('{');
+    SELECT COUNT(COLUMN_VALUE) 
+      INTO MAXIMO
+      FROM (SPLIT(P_COLUNAS, ','));
+      
+    FOR I IN (SELECT COLUMN_VALUE AS COLUNA FROM (SPLIT(P_COLUNAS, ',')))
+    LOOP
+        COUNTER := COUNTER + 1;
+        QUERYS := 'SELECT ' || I.COLUNA || ' FROM ' || P_TABELA || ' WHERE ' || P_PARAMETRO;
+        
+        SELECT DATA_TYPE
+          INTO DADOS
+          FROM ALL_TAB_COLUMNS
+         WHERE TABLE_NAME = P_TABELA
+           AND COLUMN_NAME = I.COLUNA;
+        
+        IF DADOS IN ('BLOB', 'CLOB') THEN
+            RESULTADO := '"'||DADOS||'"';
+        ELSE
+            OPEN  ORIGEM FOR QUERYS;
+            FETCH ORIGEM INTO RESULTADO;
+            CLOSE ORIGEM;
+        END IF;
+        
+        IF DADOS IN ('NUMBER', 'FLOAT') THEN
+            RESULTADO := CAST(RESULTADO AS NUMBER);
+        ELSIF DADOS NOT IN ('BLOB', 'CLOB') THEN
+            RESULTADO := '"'||RESULTADO||'"';
+        END IF;
+         
+        I.COLUNA := '"' || LOWER(I.COLUNA) || '": ';
+        
+        IF COUNTER = MAXIMO THEN
+            P_TEXT := '    ' || I.COLUNA ||RESULTADO;
+        ELSE
+            P_TEXT := '    ' || I.COLUNA ||RESULTADO||', ';
+        END IF;
+        
+        IF COUNTER = 1 THEN
+            RETORNO := RETORNO || P_TEXT;
+        ELSE
+            RETORNO := NL(RETORNO) || P_TEXT;
+        END IF;
+    END LOOP;
+    
+    RETORNO := RETORNO || NL('}');
+    
+    RETURN RETORNO;
+END;
+/
