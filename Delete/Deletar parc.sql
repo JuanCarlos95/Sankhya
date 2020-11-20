@@ -1,6 +1,7 @@
 /* DESATIVAR TRIGGERS */
 DECLARE
     TEXTO VARCHAR2(999);
+    J     NUMBER;
     ALTERA_PARCEIROS BOOLEAN := FALSE;
     DELETA_TOPS BOOLEAN := FALSE;
 BEGIN
@@ -9,10 +10,11 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('DESATIVANDO TRIGGERS...');
         FOR I IN 1..2
         LOOP
-            CASE WHEN I = 1 THEN TEXTO := 'ALTER TRIGGER TRG_BLQ_UPD_ORDSERV_JGD DISABLE';
-                 WHEN I = 2 THEN TEXTO := 'ALTER TRIGGER TRG_BLQ_ORDSERV_JGD DISABLE';
+            CASE WHEN I = 1 THEN TEXTO := 'TRG_BLQ_UPD_ORDSERV_JGD';
+                 WHEN I = 2 THEN TEXTO := 'TRG_BLQ_ORDSERV_JGD';
             END CASE;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||'executado com sucesso!');
+            EXECUTE IMMEDIATE 'ALTER TRIGGER '||TEXTO||' DISABLE';
+            DBMS_OUTPUT.PUT_LINE('Trigger   '||TEXTO||'   desativada com sucesso!');
             IF I = 2 THEN
                 DBMS_OUTPUT.PUT_LINE('TODAS AS TRIGGERS FORAM DESATIVADAS COM SUCESSO!!');
             END IF;
@@ -44,9 +46,10 @@ BEGIN
         LOOP
             IF I.CODPARC NOT IN (0, 18, 50, 53, 75, 96) THEN
                 DELETE FROM TGFPAR WHERE CODPARC = I.CODPARC;
+                J := J + 1;
             END IF;
         END LOOP;
-        DBMS_OUTPUT.PUT_LINE('EXCLUSÃO EXECUTADA COM SUCESSO!!');
+        DBMS_OUTPUT.PUT_LINE(J||' PARCEIROS EXCLUIDOS COM SUCESSO!!');
     END;
 /* FIM DO BLOCO */
 /* ATIVANDO TRIGGERS */
@@ -54,10 +57,11 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('ATIVANDO TRIGGERS...');
         FOR I IN 1..2
         LOOP
-            CASE WHEN I = 1 THEN TEXTO := 'ALTER TRIGGER TRG_BLQ_UPD_ORDSERV_JGD ENABLE';
-                 WHEN I = 2 THEN TEXTO := 'ALTER TRIGGER TRG_BLQ_ORDSERV_JGD ENABLE';
+            CASE WHEN I = 1 THEN TEXTO := 'TRG_BLQ_UPD_ORDSERV_JGD';
+                 WHEN I = 2 THEN TEXTO := 'TRG_BLQ_ORDSERV_JGD';
             END CASE;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||'executado com sucesso!');
+            DBMS_OUTPUT.PUT_LINE('Trigger   '||TEXTO||'   ativada com sucesso!');
+            EXECUTE IMMEDIATE 'ALTER TRIGGER '||TEXTO||' ENABLE';
             IF I = 2 THEN
                 DBMS_OUTPUT.PUT_LINE('TODAS AS TRIGGERS FORAM ATIVANDO COM SUCESSO!!');
             END IF;

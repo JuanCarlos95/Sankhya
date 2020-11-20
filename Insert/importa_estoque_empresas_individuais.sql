@@ -3,12 +3,10 @@ CREATE TABLE IMPORT_ESTOQUE(
     ESTOQUE NUMBER,
     INSERIDO VARCHAR2(10) DEFAULT 'N'
 );
-
 CREATE TABLE NOTAS_GERADAS(
     NUNOTA NUMBER,
-    HORA   TIMESTAMP
-);  
-/
+    HORA TIMESTAMP
+);
 DECLARE
     APAGAR NUMBER;
     DELETADOS NUMBER := 0;
@@ -23,7 +21,7 @@ BEGIN
         EXCEPTION WHEN NO_DATA_FOUND THEN
             APAGAR := 0;
         END;
-        
+
         IF APAGAR = 0 THEN
             DELETE FROM IMPORT_ESTOQUE
              WHERE CODPROD = I.CODPROD;
@@ -34,38 +32,52 @@ BEGIN
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('DELETADOS: '|| DELETADOS);
 END;
-/* */
 DECLARE
-    REGCAB TGFCAB%ROWTYPE;
-    REGITE TGFITE%ROWTYPE;
-    P_DHALTER TGFTOP.DHALTER%TYPE;
-    PARAMETRO NUMBER := 1;
-    SAIDA NUMBER;
-    CONTADOR NUMBER;
-    ACESSO NUMBER;
-    V_NUNOTA NUMBER;
-    P_RETORNO VARCHAR2(4000);
-    P_CODVOL VARCHAR2(10);
-    V_XML VARCHAR2(4000);
+    REGCAB      TGFCAB%ROWTYPE;
+    REGITE      TGFITE%ROWTYPE;
+    P_DHALTER   TGFTOP.DHALTER%TYPE;
+    PARAMETRO   NUMBER := 1;
+    SAIDA       NUMBER;
+    CONTADOR    NUMBER;
+    ACESSO      NUMBER;
+    V_NUNOTA    NUMBER;
+    P_CODVOL    VARCHAR2(10);
     P_SEQUENCIA NUMBER;
+    EMPRESA     NUMBER;
+    PARCEIRO    NUMBER;
+    CENCUSTO    NUMBER;
+    CODLOCAL    NUMBER;
 BEGIN
+    EMPRESA  := :EMPRESA;
+    PARCEIRO := :EMPRESA;
+    CENCUSTO := :EMPRESA * 10000;
+    
+    IF EMPRESA = 1 THEN
+        CODLOCAL := 10;
+    ELSE
+        CODLOCAL := 20;
+    END IF;
+
     SELECT COUNT(*)
       INTO CONTADOR
       FROM IMPORT_ESTOQUE;
-    
+
     SELECT *
       INTO REGCAB
       FROM TGFCAB
-     WHERE NUNOTA = 2;
-        
-    SELECT MAX(DHALTER) 
+     WHERE NUNOTA = 3;
+
+    SELECT MAX(DHALTER)
       INTO P_DHALTER
       FROM TGFTOP
      WHERE CODTIPOPER = REGCAB.CODTIPOPER;
-                
-    REGCAB.DHTIPOPER := P_DHALTER;
 
-    FOR I IN 1..CONTADOR 
+    REGCAB.DHTIPOPER := P_DHALTER;
+    REGCAB.CODEMP    := EMPRESA;
+    REGCAB.CODPARC   := PARCEIRO;
+    REGCAB.CODCENCUS := CENCUSTO;
+
+    FOR I IN 1..CONTADOR
     LOOP
         IF (I/(100 * PARAMETRO)) - 1 = 0 THEN
             ACESSO := 1;
@@ -73,85 +85,79 @@ BEGIN
         ELSE
             ACESSO := 0;
         END IF;
-        
-        
+
         IF I = 1 OR ACESSO = 1 THEN
             SELECT MAX(NUNOTA) + 1
               INTO V_NUNOTA
               FROM TGFCAB;
-          
+
             REGCAB.NUNOTA := V_NUNOTA;
-            
+
             INSERT INTO TGFCAB
                 VALUES REGCAB;
-                
+
             INSERT INTO NOTAS_GERADAS
                 VALUES (V_NUNOTA, SYSDATE);
         END IF;
-        
+
         REGCAB.NUNOTA := V_NUNOTA;
         
-        FOR J IN (SELECT * FROM IMPORT_ESTOQUE WHERE INSERIDO = 'N') 
+        SELECT   *
+          INTO REGITE
+          FROM TGFITE
+         WHERE CODPROD = 2792
+           AND NUNOTA = 3;
+
+        FOR J IN (SELECT * FROM IMPORT_ESTOQUE WHERE INSERIDO = 'N')
         LOOP
             SELECT COUNT(CODPROD)
               INTO SAIDA
               FROM TGFITE
              WHERE NUNOTA = V_NUNOTA;
-             
+
             IF SAIDA = 100 THEN
                 EXIT;
             END IF;
-            
-            SELECT *
-              INTO REGITE
-              FROM TGFITE
-             WHERE CODPROD = 2792
-               AND NUNOTA = 2;
-                
+
             SELECT CODVOL
               INTO P_CODVOL
               FROM TGFPRO
              WHERE CODPROD = J.CODPROD;
-             
+
             REGITE.NUNOTA       := V_NUNOTA;
             REGITE.CODPROD      := J.CODPROD;
             REGITE.QTDNEG       := J.ESTOQUE;
             REGITE.PERCDESC     := 0;
             REGITE.VLRDESC      := 0;
-            REGITE.CODLOCALORIG := 10;
+            REGITE.CODLOCALORIG := CODLOCAL;
             REGITE.VLRTOT       := 0;
             REGITE.CONTROLE     := ' ';
             REGITE.SEQUENCIA    := NULL;
             REGITE.CODVOL       := P_CODVOL;
-             
-            BEGIN       
+
+            BEGIN
                 SELECT COUNT(CODPROD) + 1
                   INTO P_SEQUENCIA
                   FROM TGFITE
                  WHERE NUNOTA = REGITE.NUNOTA;
-            EXCEPTION WHEN NO_DATA_FOUND THEN 
+            EXCEPTION WHEN NO_DATA_FOUND THEN
                 P_SEQUENCIA := 1;
             END;
-            
+
             REGITE.SEQUENCIA := P_SEQUENCIA;
-            
+
             INSERT INTO TGFITE
                 VALUES REGITE;
-                
+
             UPDATE IMPORT_ESTOQUE SET INSERIDO = 'S'
              WHERE CODPROD = J.CODPROD;
         END LOOP;
         DBMS_OUTPUT.PUT_LINE(CONTADOR - I);
     END LOOP;
-    
-    FOR X IN (SELECT * FROM NOTAS_GERADAS)
-    LOOP
-        UPDATE TGFCAB SET STATUSNOTA = 'L'
-         WHERE NUNOTA = X.NUNOTA;
-    END LOOP;
-    DBMS_OUTPUT.PUT_LINE('CHUPA SANKHYA, SOU MELHOR QUE VCS!');
+    DBMS_OUTPUT.PUT_LINE('EMPRESA '||EMPRESA||' PRONTA');
     EXECUTE IMMEDIATE 'DELETE FROM IMPORT_ESTOQUE';
-    EXECUTE IMMEDIATE 'DROP TABLE IMPORT_ESTOQUE';
+    IF EMPRESA = 3 THEN
+        EXECUTE IMMEDIATE 'DROP TABLE IMPORT_ESTOQUE';
+    END IF;
 END;
 /
-

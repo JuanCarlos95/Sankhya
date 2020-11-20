@@ -1,0 +1,7 @@
+--Executar .bat na Área de Trabalho--
+
+--Concluindo a execução do mesmo, jogar as imagens para a pasta apropriada no servidor de aplicação 
+Programa: WinSCP;
+IP: 172.20.55.243;
+PATH: /home/mgeweb/modelos/imagem/imagensprodutos/;
+

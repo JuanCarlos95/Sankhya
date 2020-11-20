@@ -6,30 +6,30 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('INICIANDO PROCESSO DE EXCLUSÃO DE PRODUTOS...');
     BEGIN
         DBMS_OUTPUT.PUT_LINE('DESATIVANDO TRIGGERS...');
-        FOR I IN 1..17 
+                FOR I IN 1..17 
         LOOP
-            CASE WHEN I = 1 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQALTERITC_COT_JGD DISABLE';
-                 WHEN I = 2 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_INS_PRODOS_JGD DISABLE';
-                 WHEN I = 3 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_INS_SERVOS_JGD DISABLE';
-                 WHEN I = 4 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_UPD_PRODOS_JGD DISABLE';
-                 WHEN I = 5 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_UPD_SERVOS_JGD DISABLE';
-                 WHEN I = 6 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_PRODOS_JGD DISABLE';
-                 WHEN I = 7 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_SERVOS_JGD DISABLE';
-                 WHEN I = 8 THEN TEXTO  := 'ALTER TRIGGER TRG_DLT_TCIBEM DISABLE';
-                 WHEN I = 9 THEN TEXTO  := 'ALTER TRIGGER TRG_DLT_AD_IMPTABITE_JGD DISABLE';
-                 WHEN I = 10 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_UPD_TGFCUS DISABLE';
-                 WHEN I = 11 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TGFITE DISABLE';
-                 WHEN I = 12 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TGFITS DISABLE';
-                 WHEN I = 13 THEN TEXTO := 'ALTER TRIGGER TRG_INC_UPD_DLT_TGFITE_RASTEST DISABLE';
-                 WHEN I = 14 THEN TEXTO := 'ALTER TRIGGER TRG_INC_UPD_DLT_TGFITE_ESTTERC DISABLE';
-                 WHEN I = 15 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCIMOV DISABLE';
-                 WHEN I = 16 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCIBEM DISABLE';
-                 WHEN I = 17 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCISAL DISABLE';
+            CASE WHEN I = 1 THEN TEXTO  := 'TRG_BLQALTERITC_COT_JGD';
+                 WHEN I = 2 THEN TEXTO  := 'TRG_BLQ_INS_PRODOS_JGD';
+                 WHEN I = 3 THEN TEXTO  := 'TRG_BLQ_INS_SERVOS_JGD';
+                 WHEN I = 4 THEN TEXTO  := 'TRG_BLQ_UPD_PRODOS_JGD';
+                 WHEN I = 5 THEN TEXTO  := 'TRG_BLQ_UPD_SERVOS_JGD';
+                 WHEN I = 6 THEN TEXTO  := 'TRG_BLQ_PRODOS_JGD';
+                 WHEN I = 7 THEN TEXTO  := 'TRG_BLQ_SERVOS_JGD';
+                 WHEN I = 8 THEN TEXTO  := 'TRG_DLT_TCIBEM';
+                 WHEN I = 9 THEN TEXTO  := 'TRG_DLT_AD_IMPTABITE_JGD';
+                 WHEN I = 10 THEN TEXTO := 'TRG_DLT_UPD_TGFCUS';
+                 WHEN I = 11 THEN TEXTO := 'TRG_DLT_TGFITE';
+                 WHEN I = 12 THEN TEXTO := 'TRG_DLT_TGFITS';
+                 WHEN I = 13 THEN TEXTO := 'TRG_INC_UPD_DLT_TGFITE_RASTEST';
+                 WHEN I = 14 THEN TEXTO := 'TRG_INC_UPD_DLT_TGFITE_ESTTERC';
+                 WHEN I = 15 THEN TEXTO := 'TRG_DLT_TCIMOV';
+                 WHEN I = 16 THEN TEXTO := 'TRG_DLT_TCIBEM';
+                 WHEN I = 17 THEN TEXTO := 'TRG_DLT_TCISAL';
             END CASE;
-            EXECUTE IMMEDIATE TEXTO;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||' executado com sucesso!!');
+            EXECUTE IMMEDIATE 'ALTER TRIGGER '||TEXTO||' DISABLE';
+            DBMS_OUTPUT.PUT_LINE('Trigger   '||TEXTO||'   desativada com sucesso!!');
             IF I = 17 THEN
-                DBMS_OUTPUT.PUT_LINE('TODAS AS TRIGGERS FORAM DESATIVADAS COM SUCESSO!!');
+                DBMS_OUTPUT.PUT_LINE('Todas as triggers foram desativadas com sucesso!!');
             END IF;
         END LOOP;
     END;
@@ -50,7 +50,7 @@ BEGIN
              --    WHEN I = 9 THEN TEXTO  := 'ALTER TABLE TCIMOV MODIFY CONSTRAINT FK_TCIDIBI_CODBEM_TCIBEM DISABLE';
     */        
             EXECUTE IMMEDIATE TEXTO;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||' executado com sucesso!!');
+            DBMS_OUTPUT.PUT_LINE('Comando   '||TEXTO||'   executado com sucesso!!');
     /*      IF I = 9 THEN*/
                 DBMS_OUTPUT.PUT_LINE('TODAS AS CONSTRAINTS FORAM DESATIVADAS COM SUCESSO!!');
     /*      END IF; */
@@ -126,7 +126,7 @@ BEGIN
         --       WHEN I = 9 THEN TEXTO  := 'ALTER TABLE TCIMOV MODIFY CONSTRAINT FK_TCIDIBI_CODBEM_TCIBEM ENABLE';
         --    END CASE;
             EXECUTE IMMEDIATE TEXTO;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||' executado com sucesso!!');
+            DBMS_OUTPUT.PUT_LINE('Comando   '||TEXTO||'   executado com sucesso!!');
         --  IF I = 9 THEN
                 DBMS_OUTPUT.PUT_LINE('TODAS AS CONSTRAINTS FORAM ATIVADAS COM SUCESSO!!');
         --  END IF;
@@ -138,26 +138,26 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('ATIVANDO TRIGGERS...');
         FOR I IN 1..17 
         LOOP
-            CASE WHEN I = 1 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQALTERITC_COT_JGD ENABLE';
-                 WHEN I = 2 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_INS_PRODOS_JGD ENABLE';
-                 WHEN I = 3 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_INS_SERVOS_JGD ENABLE';
-                 WHEN I = 4 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_UPD_PRODOS_JGD ENABLE';
-                 WHEN I = 5 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_UPD_SERVOS_JGD ENABLE';
-                 WHEN I = 6 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_PRODOS_JGD ENABLE';
-                 WHEN I = 7 THEN TEXTO  := 'ALTER TRIGGER TRG_BLQ_SERVOS_JGD ENABLE';
-                 WHEN I = 8 THEN TEXTO  := 'ALTER TRIGGER TRG_DLT_TCIBEM ENABLE';
-                 WHEN I = 9 THEN TEXTO  := 'ALTER TRIGGER TRG_DLT_AD_IMPTABITE_JGD ENABLE';
-                 WHEN I = 10 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_UPD_TGFCUS ENABLE';
-                 WHEN I = 11 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TGFITE ENABLE';
-                 WHEN I = 12 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TGFITS ENABLE';
-                 WHEN I = 13 THEN TEXTO := 'ALTER TRIGGER TRG_INC_UPD_DLT_TGFITE_RASTEST ENABLE';
-                 WHEN I = 14 THEN TEXTO := 'ALTER TRIGGER TRG_INC_UPD_DLT_TGFITE_ESTTERC ENABLE';
-                 WHEN I = 15 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCIMOV ENABLE';
-                 WHEN I = 16 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCIBEM ENABLE';
-                 WHEN I = 17 THEN TEXTO := 'ALTER TRIGGER TRG_DLT_TCISAL ENABLE';
+            CASE WHEN I = 1 THEN TEXTO  := 'TRG_BLQALTERITC_COT_JGD';
+                 WHEN I = 2 THEN TEXTO  := 'TRG_BLQ_INS_PRODOS_JGD';
+                 WHEN I = 3 THEN TEXTO  := 'TRG_BLQ_INS_SERVOS_JGD';
+                 WHEN I = 4 THEN TEXTO  := 'TRG_BLQ_UPD_PRODOS_JGD';
+                 WHEN I = 5 THEN TEXTO  := 'TRG_BLQ_UPD_SERVOS_JGD';
+                 WHEN I = 6 THEN TEXTO  := 'TRG_BLQ_PRODOS_JGD';
+                 WHEN I = 7 THEN TEXTO  := 'TRG_BLQ_SERVOS_JGD';
+                 WHEN I = 8 THEN TEXTO  := 'TRG_DLT_TCIBEM';
+                 WHEN I = 9 THEN TEXTO  := 'TRG_DLT_AD_IMPTABITE_JGD';
+                 WHEN I = 10 THEN TEXTO := 'TRG_DLT_UPD_TGFCUS';
+                 WHEN I = 11 THEN TEXTO := 'TRG_DLT_TGFITE';
+                 WHEN I = 12 THEN TEXTO := 'TRG_DLT_TGFITS';
+                 WHEN I = 13 THEN TEXTO := 'TRG_INC_UPD_DLT_TGFITE_RASTEST';
+                 WHEN I = 14 THEN TEXTO := 'TRG_INC_UPD_DLT_TGFITE_ESTTERC';
+                 WHEN I = 15 THEN TEXTO := 'TRG_DLT_TCIMOV';
+                 WHEN I = 16 THEN TEXTO := 'TRG_DLT_TCIBEM';
+                 WHEN I = 17 THEN TEXTO := 'TRG_DLT_TCISAL';
             END CASE;
-            EXECUTE IMMEDIATE TEXTO;
-            DBMS_OUTPUT.PUT_LINE('Comando '||TEXTO||' executado com sucesso!!');
+            EXECUTE IMMEDIATE 'ALTER TRIGGER '||TEXTO||' ENABLE';
+            DBMS_OUTPUT.PUT_LINE('Trigger   '||TEXTO||'   ativada com sucesso!!');
             IF I = 17 THEN
                 DBMS_OUTPUT.PUT_LINE('Todas as triggers foram ativadas com sucesso!!');
             END IF;
