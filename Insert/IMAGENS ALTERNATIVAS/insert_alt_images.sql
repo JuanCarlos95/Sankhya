@@ -49,3 +49,5 @@ begin
     dbms_output.put_line(contador);
 end;
 /
+
+UPDATE TGFPRO SET AD_CARACTERISTICA = DESCRPROD || ' ' || REFFORN;

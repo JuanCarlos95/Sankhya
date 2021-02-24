@@ -38,6 +38,7 @@ BEGIN
             FOR K IN 1..CONTACODIGO
             LOOP
                 IF K = 1 THEN
+                    DBMS_OUTPUT.PUT_LINE(J.CODBARRAS);
                     UPDATE TGFPRO SET REFERENCIA = J.CODBARRAS
                      WHERE CODPROD = I.CODPROD;
                     RESULTU := RESULTU + 1; 
@@ -72,6 +73,8 @@ BEGIN
     LOOP
         FOR J IN (SELECT * FROM TGFBAR WHERE CODPROD = I.CODPROD)
         LOOP
+            DBMS_OUTPUT.PUT_LINE(J.codbarra);
+            DBMS_OUTPUT.PUT_LINE(I .referencia);
             IF J.CODBARRA = I.REFERENCIA THEN
                 DELETE FROM TGFBAR WHERE CODPROD = I.CODPROD AND CODBARRA = I.REFERENCIA;
             END IF;
